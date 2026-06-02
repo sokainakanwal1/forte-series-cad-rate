@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CAD→USD Rate</title>
+<style>
+  body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+  .card { background: white; border-radius: 12px; padding: 2rem 2.5rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .rate { font-size: 48px; font-weight: 600; margin: 0.5rem 0; }
+  .meta { color: #888; font-size: 13px; margin-bottom: 1.5rem; }
+  button { background: #1a1a1a; color: white; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; cursor: pointer; }
+  button:hover { background: #333; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="meta">CAD → USD · live rate</div>
+  <div class="rate" id="rate">…</div>
+  <div class="meta" id="date"></div>
+  <button onclick="send()">Send to Claude ↗</button>
+</div>
+<script>
+let rate, date;
+fetch('https://api.frankfurter.dev/v1/current?from=CAD&to=USD')
+  .then(r => r.json())
+  .then(d => {
+    rate = d.rates.USD.toFixed(5);
+    date = d.date;
+    document.getElementById('rate').textContent = rate;
+    document.getElementById('date').textContent = date;
+  })
+  .catch(() => {
+    rate = '0.72800';
+    document.getElementById('rate').textContent = rate;
+    document.getElementById('date').textContent = 'fallback';
+  });
+
+function send() {
+  const msg = `CAD→USD rate for the weekly KPI update: ${rate} (as of ${date}). Use this for Amazon Canada revenue conversion (J16, H34).`;
+  window.open(`https://claude.ai/new?q=${encodeURIComponent(msg)}`, '_blank');
+}
+</script>
+</body>
+</html>
